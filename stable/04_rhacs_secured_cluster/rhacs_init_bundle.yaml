@@ -39,6 +39,10 @@ spec:
               data:
                 ca.pem: |
                   {{ fromSecret "rhacs-operator" "collector-tls" "ca.pem" }}
+                collector-cert.pem: |
+                   {{ fromSecret "rhacs-operator" "collector-tls" "collector-cert.pem" }}
+                collector-key.pem: |
+                   {{ fromSecret "rhacs-operator" "collector-tls" "collector-key.pem" }}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
