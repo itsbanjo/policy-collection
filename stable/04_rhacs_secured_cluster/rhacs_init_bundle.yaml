@@ -56,7 +56,7 @@ spec:
                 apiVersion: v1
                 metadata:
                   name: admission-control-tls
-                  namespace: stackrox
+                  namespace: rhacs-operator
                 data:
                   admission-control-cert.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "admission-control-tls").data "admission-control-cert.pem" ) hub}}'
                   admission-control-key.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "admission-control-tls").data "admission-control-key.pem" ) hub}}'
@@ -77,7 +77,7 @@ spec:
                 apiVersion: v1
                 metadata:
                   name: sensor-tls
-                  namespace: stackrox
+                  namespace: rhacs-operator
                 data:
                   sensor-cert.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "sensor-tls").data "sensor-cert.pem" ) hub}}'
                   sensor-key.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "sensor-tls").data "sensor-key.pem" ) hub}}'
