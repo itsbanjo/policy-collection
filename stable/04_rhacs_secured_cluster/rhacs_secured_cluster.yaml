@@ -92,8 +92,7 @@ spec:
                   {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
                 auditLogs:
                   collection: Auto
-                centralEndpoint: |
-                  {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
+                  centralEndpoint: https://central-rhacs-operator.apps.49.integrate.zone:443
                 admissionControl:
                   listenOnCreates: false
                   listenOnEvents: true
