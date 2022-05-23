@@ -34,7 +34,7 @@ spec:
               apiVersion: v1
               kind: Namespace
               metadata:
-                name: stackrox
+                name: rhacs-operator
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -82,11 +82,11 @@ spec:
         object-templates:
           - complianceType: musthave
             objectDefinition:
-              apiVersion: platform.stackrox.io/v1alpha1
+              apiVersion: platform.rhacs-operator.io/v1alpha1
               kind: SecuredCluster
               metadata:
-                namespace: stackrox
-                name: stackrox-secured-cluster-services
+                namespace: rhacs-operator
+                name: rhacs-operator-secured-cluster-services
               spec:
                 clusterName: |
                   {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
