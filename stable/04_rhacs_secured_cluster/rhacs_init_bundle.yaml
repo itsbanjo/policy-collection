@@ -36,15 +36,11 @@ spec:
               metadata:
                 namespace: rhacs-operator
                 name: collector-tls
-              annotations:
-                apps.open-cluster-management.io/deployables: "true"
               data:
-                ca.pem: |
-                  {{ fromSecret "rhacs-operator" "collector-tls" "ca.pem" }}
-                collector-cert.pem: |
-                  {{ fromSecret "rhacs-operator" "collector-tls" "collector-cert.pem" }}
-                collector-key.pem: |
-                  {{ fromSecret "rhacs-operator" "collector-tls" "collector-key.pem" }}
+                  collector-cert.pem: '{{hub ( index ( lookup "v1"  "Secret" "stackrox" "collector-tls").data "collector-cert.pem" ) hub}}'
+                  collector-key.pem: '{{hub ( index ( lookup "v1"  "Secret" "stackrox" "collector-tls").data "collector-key.pem" ) hub}}'
+                  ca.pem: '{{hub ( index ( lookup "v1"  "Secret" "stackrox" "collector-tls").data "ca.pem" ) hub}}'
+
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
