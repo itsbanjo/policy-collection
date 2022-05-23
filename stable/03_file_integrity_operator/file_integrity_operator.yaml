@@ -32,7 +32,7 @@ spec:
       metadata:
         name: openshift-file-integrity-og
       spec:
-        remediationAction: inform
+        remediationAction: Enforce
         severity: high
         object-templates:
           - complianceType: musthave
