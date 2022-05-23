@@ -36,6 +36,8 @@ spec:
               metadata:
                 namespace: rhacs-operator
                 name: collector-tls
+              annotations:
+                apps.open-cluster-management.io/deployables: "secret"
               data:
                 ca.pem: |
                   {{ fromSecret "rhacs-operator" "collector-tls" "ca.pem" }}
