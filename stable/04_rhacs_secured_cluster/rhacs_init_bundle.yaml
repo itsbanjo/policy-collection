@@ -40,6 +40,7 @@ spec:
                   collector-cert.pem: '{{hub ( index ( lookup "v1"  "Secret" "stackrox" "collector-tls").data "collector-cert.pem" ) hub}}'
                   collector-key.pem: '{{hub ( index ( lookup "v1"  "Secret" "stackrox" "collector-tls").data "collector-key.pem" ) hub}}'
                   ca.pem: '{{hub ( index ( lookup "v1"  "Secret" "stackrox" "collector-tls").data "ca.pem" ) hub}}'
+              type: Opaque
 
 ---
 apiVersion: policy.open-cluster-management.io/v1
