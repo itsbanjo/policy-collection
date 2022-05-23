@@ -83,7 +83,7 @@ spec:
           - complianceType: musthave
             objectDefinition:
               apiVersion: platform.rhacs-operator.io/v1alpha1
-              kind: SecuredCluster
+              kind: SecuredClusters
               metadata:
                 namespace: rhacs-operator
                 name: rhacs-operator-secured-cluster-services
