@@ -115,7 +115,7 @@ placementRef:
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-  - name: redhat-acs-installed
+  - name: redhat-acs-secured-cluster-configured
     kind: Policy
     apiGroup: policy.open-cluster-management.io
 ---
