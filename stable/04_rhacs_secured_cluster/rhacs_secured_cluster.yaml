@@ -108,8 +108,8 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: acs-remote-clusters-binding
-  namespace: rhacs-operator
+  name: rhacs-secured-clusters-binding
+  namespace: policies
 placementRef:
   name: acs-remote-clusters
   kind: PlacementRule
@@ -123,7 +123,7 @@ apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: acs-remote-clusters
-  namespace: rhacs-operator
+  namespace: policies
 spec:
   clusterConditions:
   - status: "True"
