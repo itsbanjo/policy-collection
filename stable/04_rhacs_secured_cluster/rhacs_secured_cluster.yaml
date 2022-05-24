@@ -1,17 +1,9 @@
-# This policy deploys the Red Hat Advanced Cluster Security Secure Cluster
-# Services to all OpenShift managed clusters.  Note that it is set to
-# enforce by default and it requires RHACM 2.3 template support.
-#
-# Prior to applying this policy you must visit 
-# https://github.com/stolostron/advanced-cluster-security 
-# and follow the instructions there to deploy prerequisite bundles
-# needed by the Secure Cluster Services for communicating with the
-# Central server.
-#
+# This policy installs the Advanced Cluster Security Operator on the ACM hub
+# cluster and it create the Central Server.
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: policy-advanced-managed-cluster-security
+  name: policy-advanced-cluster-security-central
   annotations:
     policy.open-cluster-management.io/standards: NIST SP 800-53
     policy.open-cluster-management.io/categories: CM Configuration Management
@@ -24,9 +16,9 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: managed-cluster-security-ns
+        name: advanced-cluster-security-namespace
       spec:
-        remediationAction: inform
+        remediationAction: enforce
         severity: high
         object-templates:
           - complianceType: musthave
@@ -53,9 +45,9 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: managed-cluster-security-operator-sub
+        name: advanced-cluster-security-operator-subscription
       spec:
-        remediationAction: inform
+        remediationAction: enforce
         severity: high
         object-templates:
           - complianceType: musthave
@@ -75,56 +67,63 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: managed-cluster-security-endpoints
+        name: advanced-cluster-security-central
       spec:
-        remediationAction: inform
+        remediationAction: enforce
         severity: high
         object-templates:
           - complianceType: musthave
             objectDefinition:
               apiVersion: platform.stackrox.io/v1alpha1
-              kind: SecuredCluster
+              kind: Central
               metadata:
                 namespace: rhacs-operator
-                name: rhacs-operator-secured-cluster-services
+                name: stackrox-central-services
               spec:
-                clusterName: |
-                  {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
-                centralEndpoint: https://central-rhacs-operator.apps.49.integrate.zone:443
-                auditLogs:
-                  collection: Auto
-                admissionControl:
-                  listenOnCreates: false
-                  listenOnEvents: true
-                  listenOnUpdates: false
-                perNode:
-                  collector:
-                    collection: KernelModule
-                    imageFlavor: Regular
-                  taintToleration: TolerateTaints
+                central:
+                  exposure:
+                    loadBalancer:
+                      enabled: false
+                      port: 443
+                    nodePort:
+                      enabled: false
+                    route:
+                      enabled: true
+                  persistence:
+                    persistentVolumeClaim:
+                      claimName: stackrox-db
+                egress:
+                  connectivityPolicy: Online
+                scanner:
+                  analyzer:
+                    scaling:
+                      autoScaling: Enabled
+                      maxReplicas: 5
+                      minReplicas: 2
+                      replicas: 3
+                  scannerComponent: Enabled
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: binding-policy-advanced-managed-cluster-security
+  name: binding-policy-advanced-cluster-security-central
 placementRef:
-  name: placement-policy-advanced-managed-cluster-security
+  name: placement-policy-advanced-cluster-security-central
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: policy-advanced-managed-cluster-security
+- name: policy-advanced-cluster-security-central
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: placement-policy-advanced-managed-cluster-security
+  name: placement-policy-advanced-cluster-security-central
 spec:
   clusterConditions:
   - status: "True"
     type: ManagedClusterConditionAvailable
   clusterSelector:
     matchExpressions:
-            - {key: environment, operator: In, values: ["dev"]}
-
+      - {key: environment, operator: In, values: ["dev"]}
