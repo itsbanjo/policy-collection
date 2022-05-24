@@ -29,13 +29,23 @@ spec:
                   name: rhacs-secured-cluster-services
                 spec:
                   clusterName: '{{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}'
+                  centralEndpoint: https://central-rhacs-operator.apps.49.integrate.zone:443
                   auditLogs:
                     collection: Auto
-                    centralEndpoint: https://central-rhacs-operator.apps.49.integrate.zone:443
                   admissionControl:
+                    bypass: BreakGlassAnnotation
+                    contactImageScanners: DoNotScanInline
                     listenOnCreates: false
                     listenOnEvents: true
-                    listenOnUpdates: false
+                    listenOnUpdates: true
+                  scanner:
+                    analyzer:
+                      scaling:
+                        autoScaling: Enabled
+                        maxReplicas: 1
+                        minReplicas: 1
+                        replicas: 1
+                    scannerComponent: AutoSense
                   perNode:
                     collector:
                       collection: KernelModule
