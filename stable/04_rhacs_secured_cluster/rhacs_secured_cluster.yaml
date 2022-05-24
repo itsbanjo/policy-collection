@@ -2,7 +2,7 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
   name: redhat-acs-secured-cluster-configured
-  namespace: policies
+  namespace: rhacs-operator
   annotations:
     policy.open-cluster-management.io/standards: Infrastructure security
     policy.open-cluster-management.io/categories: Data security
