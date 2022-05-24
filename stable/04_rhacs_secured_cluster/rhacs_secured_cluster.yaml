@@ -29,7 +29,7 @@ spec:
                   name: rhacs-secured-cluster-services
                 spec:
                   clusterName: '{{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}'
-                  centralEndpoint: central-rhacs-operator.apps.49.integrate.zone:443
+                  centralEndpoint: '{{hub ( index ( lookup "route.openshift.io/v1" "Route" "rhacs-operator" "central").spec "host" ) hub}}:443'
                   auditLogs:
                     collection: Auto
                   admissionControl:
