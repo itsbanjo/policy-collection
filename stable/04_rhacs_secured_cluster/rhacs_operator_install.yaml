@@ -3,7 +3,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: policy-advanced-cluster-security-central
+  name: rhacs-operator-installed
   annotations:
     policy.open-cluster-management.io/standards: NIST SP 800-53
     policy.open-cluster-management.io/categories: CM Configuration Management
@@ -63,45 +63,6 @@ spec:
                 name: rhacs-operator
                 source: redhat-operators
                 sourceNamespace: openshift-marketplace
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: advanced-cluster-security-central
-      spec:
-        remediationAction: enforce
-        severity: high
-        object-templates:
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: platform.stackrox.io/v1alpha1
-              kind: Central
-              metadata:
-                namespace: rhacs-operator
-                name: stackrox-central-services
-              spec:
-                central:
-                  exposure:
-                    loadBalancer:
-                      enabled: false
-                      port: 443
-                    nodePort:
-                      enabled: false
-                    route:
-                      enabled: true
-                  persistence:
-                    persistentVolumeClaim:
-                      claimName: stackrox-db
-                egress:
-                  connectivityPolicy: Online
-                scanner:
-                  analyzer:
-                    scaling:
-                      autoScaling: Enabled
-                      maxReplicas: 5
-                      minReplicas: 2
-                      replicas: 3
-                  scannerComponent: Enabled
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
