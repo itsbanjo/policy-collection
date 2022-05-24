@@ -16,17 +16,11 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: advanced-cluster-security-namespace
+        name: rhacs-operator-ns-must-exist
       spec:
         remediationAction: enforce
         severity: high
         object-templates:
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: rhacs-operator
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -45,7 +39,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: advanced-cluster-security-operator-subscription
+        name: rhacs-operator-must-installed
       spec:
         remediationAction: enforce
         severity: high
