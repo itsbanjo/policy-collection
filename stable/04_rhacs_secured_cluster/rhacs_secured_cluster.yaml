@@ -119,15 +119,15 @@ subjects:
     kind: Policy
     apiGroup: policy.open-cluster-management.io
 ---
+---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
   name: acs-remote-clusters
-  namespace: policies
 spec:
   clusterConditions:
   - status: "True"
     type: ManagedClusterConditionAvailable
   clusterSelector:
-    matchLabels:
+    matchExpressions:
       - {key: environment, operator: In, values: ["dev"]}
