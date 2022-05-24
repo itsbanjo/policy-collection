@@ -31,7 +31,7 @@ spec:
                   clusterName: '{{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}'
                   auditLogs:
                     collection: Auto
-                  centralEndpoint: '{{hub ( index ( lookup "route.openshift.io/v1" "Route" "rhacs-operator" "central").spec "host" ) hub}}:443'
+                    centralEndpoint: https://central-rhacs-operator.apps.49.integrate.zone:443
                   admissionControl:
                     listenOnCreates: false
                     listenOnEvents: true
