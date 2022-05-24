@@ -1,129 +1,133 @@
-# This policy installs the Advanced Cluster Security Operator on the ACM hub
-# cluster and it create the Central Server.
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: policy-advanced-cluster-security-central
+  name: redhat-acs-secured-cluster-configured
+  namespace: rhacs-operator
   annotations:
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-    policy.open-cluster-management.io/categories: CM Configuration Management
-    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/standards: Infrastructure security
+    policy.open-cluster-management.io/categories: Data security
+    policy.open-cluster-management.io/controls: PR.DS-1 Data-at-rest
 spec:
   remediationAction: enforce
   disabled: false
   policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: advanced-cluster-security-namespace
-      spec:
-        remediationAction: enforce
-        severity: high
-        object-templates:
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: rhacs-operator
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: rhacs-operator
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1
-              kind: OperatorGroup
-              metadata:
-                name: rhacs-operator-group
-                namespace: rhacs-operator
-              spec: {}
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: advanced-cluster-security-operator-subscription
-      spec:
-        remediationAction: enforce
-        severity: high
-        object-templates:
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: Subscription
-              metadata:
-                name: rhacs-operator
-                namespace: rhacs-operator
-              spec:
-                channel: latest
-                installPlanApproval: Automatic
-                name: rhacs-operator
-                source: redhat-operators
-                sourceNamespace: openshift-marketplace
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: advanced-cluster-security-central
-      spec:
-        remediationAction: enforce
-        severity: high
-        object-templates:
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: platform.stackrox.io/v1alpha1
-              kind: Central
-              metadata:
-                namespace: rhacs-operator
-                name: stackrox-central-services
-              spec:
-                central:
-                  exposure:
-                    loadBalancer:
-                      enabled: false
-                      port: 443
-                    nodePort:
-                      enabled: false
-                    route:
-                      enabled: true
-                  persistence:
-                    persistentVolumeClaim:
-                      claimName: stackrox-db
-                egress:
-                  connectivityPolicy: Online
-                scanner:
-                  analyzer:
-                    scaling:
-                      autoScaling: Enabled
-                      maxReplicas: 5
-                      minReplicas: 2
-                      replicas: 3
-                  scannerComponent: Enabled
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: managed-cluster-security-endpoints
+        spec:
+          remediationAction: enforce
+          severity: high
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: platform.stackrox.io/v1alpha1
+                kind: SecuredCluster
+                metadata:
+                  namespace: rhacs-operator
+                  name: rhacs-secured-cluster-services
+                spec:
+                  clusterName: '{{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}'
+                  auditLogs:
+                    collection: Auto
+                  centralEndpoint: '{{hub ( index ( lookup "route.openshift.io/v1" "Route" "rhacs-operator" "central").spec "host" ) hub}}:443'
+                  admissionControl:
+                    listenOnCreates: false
+                    listenOnEvents: true
+                    listenOnUpdates: false
+                  perNode:
+                    collector:
+                      collection: KernelModule
+                      imageFlavor: Regular
+                    taintToleration: TolerateTaints
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: copy-admission-control-tls
+        spec:
+          remediationAction: enforce
+          severity: high
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                kind: Secret
+                apiVersion: v1
+                metadata:
+                  name: admission-control-tls
+                  namespace: rhacs-operator
+                data:
+                  admission-control-cert.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "admission-control-tls").data "admission-control-cert.pem" ) hub}}'
+                  admission-control-key.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "admission-control-tls").data "admission-control-key.pem" ) hub}}'
+                  ca.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "admission-control-tls").data "ca.pem" ) hub}}'
+                type: Opaque
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: copy-collector-tls
+        spec:
+          remediationAction: enforce
+          severity: high
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                kind: Secret
+                apiVersion: v1
+                metadata:
+                  name: collector-tls
+                  namespace: rhacs-operator
+                data:
+                  collector-cert.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "collector-tls").data "collector-cert.pem" ) hub}}'
+                  collector-key.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "collector-tls").data "collector-key.pem" ) hub}}'
+                  ca.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "collector-tls").data "ca.pem" ) hub}}'
+                type: Opaque
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: copy-sensor-tls
+        spec:
+          remediationAction: enforce
+          severity: high
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                kind: Secret
+                apiVersion: v1
+                metadata:
+                  name: sensor-tls
+                  namespace: rhacs-operator
+                data:
+                  sensor-cert.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "sensor-tls").data "sensor-cert.pem" ) hub}}'
+                  sensor-key.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "sensor-tls").data "sensor-key.pem" ) hub}}'
+                  ca.pem: '{{hub ( index ( lookup "v1"  "Secret" "rhacs-operator" "sensor-tls").data "ca.pem" ) hub}}'
+                type: Opaque
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: binding-policy-advanced-cluster-security-central
+  name: acs-remote-clusters-binding
+  namespace: rhacs-operator
 placementRef:
-  name: placement-policy-advanced-cluster-security-central
+  name: acs-remote-clusters
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: policy-advanced-cluster-security-central
-  kind: Policy
-  apiGroup: policy.open-cluster-management.io
+  - name: redhat-acs-installed
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: placement-policy-advanced-cluster-security-central
+  name: acs-remote-clusters
+  namespace: rhacs-operator
 spec:
   clusterConditions:
   - status: "True"
     type: ManagedClusterConditionAvailable
   clusterSelector:
-    matchExpressions:
+    matchLabels:
       - {key: environment, operator: In, values: ["dev"]}
