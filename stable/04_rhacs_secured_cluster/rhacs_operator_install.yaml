@@ -63,11 +63,11 @@ kind: PlacementBinding
 metadata:
   name: binding-policy-advanced-cluster-security-central
 placementRef:
-  name: rhacs-operator-installed
+  name: placement-policy-advanced-cluster-security-central
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
-- name: policy-advanced-cluster-security-central
+- name: rhacs-operator-installed
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 ---
