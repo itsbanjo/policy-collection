@@ -28,7 +28,7 @@ spec:
                   namespace: rhacs-operator
                   name: rhacs-secured-cluster-services
                 spec:
-                  clusterName: '{{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}'
+                  clusterName: '{{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}-cluster'
                   centralEndpoint: '{{hub ( index ( lookup "route.openshift.io/v1" "Route" "rhacs-operator" "central").spec "host" ) hub}}:443'
                   auditLogs:
                     collection: Auto
