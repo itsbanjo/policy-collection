@@ -31,7 +31,7 @@ spec:
                     server: 'https://kubernetes.default.svc'
                   project: default
                   source:
-                    path: 'multicluster/{{ fromClusterClaim "name" }}/oauth'
+                    path: 'multicluster/{{ fromClusterClaim "name" }}/base'
                     repoURL: 'https://github.com/itsbanjo/argocd-demo.git'
                     targetRevision: HEAD
                   syncPolicy:
