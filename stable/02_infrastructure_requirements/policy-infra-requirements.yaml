@@ -37,7 +37,7 @@ spec:
                   syncPolicy:
                     automated: {}
                     syncOptions:
-                      - CreateNamespace=true
+                      - CreateNamespace=false
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
